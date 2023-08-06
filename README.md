@@ -1,80 +1,18 @@
 # Strong (app) Exports
 
-Collection of scripts to export data from Strong
+String to export Strong data
 
 ## Stronger by Science
 
-Produces a CSV for the SBS spreadsheet with reps, loads and RIRs (script translates RPEs to RIRs).
+Produces a CSV for the SBS spreadsheet with reps, loads and RIRs (script translates RPEs to RIRs). 
+
+The script requires the Strong account export data file and the earliest date to export.
 
 ### Example
 
-Given a text file composed by "share" > "copy" for each workout in Strong:
-```
-Upper 1
-Monday, 20 February 2023 at 08:30
-
-Bench Press (Dumbbell)
-Set 1: 42 kg × 8 @ 9
-Set 2: 42 kg × 7 @ 9
-Set 3: 42 kg × 6 @ 9
-
-Seated Row (Cable)
-Set 1: 62 kg × 9 @ 8
-Set 2: 62 kg × 9 @ 9
-Set 3: 62 kg × 9 @ 9
-
-Lateral Raise (Cable)
-Set 1: 3.75 kg × 13 @ 8
-Set 2: 3.75 kg × 13 @ 8
-Set 3: 3.75 kg × 12 @ 8
-Set 4: 3.75 kg × 10 @ 9
-
-Preacher Curl (Barbell)
-Set 1: 27.5 kg × 10 @ 8
-Set 2: 27.5 kg × 8 @ 8
-Set 3: 27.5 kg × 8 @ 8
-Set 4: 27.5 kg × 7 @ 9
-
-Triceps Pushdown (Cable - Straight Bar)
-Set 1: 31.25 kg × 12 @ 8
-Set 2: 31.25 kg × 11 @ 9
-Set 3: 31.25 kg × 11 @ 9
-https://strong.app.link/Wq0H31HiIxb
-
-Lower 1
-Wednesday, 22 February 2023 at 17:42
-
-Leg Press
-Set 1: 260 kg × 7 @ 8
-Set 2: 260 kg × 7 @ 9
-Set 3: 260 kg × 6 @ 8
-
-Stiff Leg Deadlift (Barbell)
-Set 1: 60 kg × 13 @ 8
-Set 2: 60 kg × 13 @ 8
-Set 3: 60 kg × 12 @ 8
-
-Leg Extension (Machine)
-Set 1: 65 kg × 14 @ 8
-Set 2: 65 kg × 13 @ 8
-Set 3: 65 kg × 13 @ 8
-Set 4: 65 kg × 13 @ 8
-
-Seated Calf Raise (Smith Machine)
-Set 1: 100 kg × 15 @ 7
-Set 2: 100 kg × 14 @ 8
-Set 3: 100 kg × 15 @ 8
-
-Dragon Flags
-Set 1: 5 reps
-Set 2: 4 reps
-Set 3: 4 reps
-https://strong.app.link/kuFLj9JiIxb
-```
-
 Running the program:
 ```
-> ruby sbs.rb < data.txt
+> ruby sbs.rb YYYY-MM-DD < data.txt
 "Upper 1","Bench Press (Dumbbell)","8,7,6","42,42,42","1,1,1"
 "Upper 1","Seated Row (Cable)","9,9,9","62,62,62","2,1,1"
 "Upper 1","Lateral Raise (Cable)","13,13,12,10","3.75,3.75,3.75,3.75","2,2,2,1"

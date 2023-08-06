@@ -1,83 +1,52 @@
-require 'date'
 require 'csv'
 
-SET_REGX = /^Set \d+: (?<weight>\d+.?\d*) kg × (?<reps>\d+) @ (?<rpe>\d+)/.freeze
-SET_WITHOUT_RPE_REGX = /^Set \d+: (?<weight>\d+.?\d*) kg × (?<reps>\d+)/.freeze
-SET_ONLY_REPS_REGX = /^Set \d+: (?<reps>\d+) reps/.freeze
+date = ARGV[0]
+if date.nil?
+  puts "date is blank"
+  exit
+end
+date = Date.parse(date)
 
-input = $stdin.read.split("\n").reject(&:empty?)
-
-i        = 0
-name     = nil
-date     = nil
-exercise = nil
-result   = []
-
-while i < input.length
-  if input[i] =~ /^https:/ # end of day workout
-    name     = nil
-    date     = nil
-    exercise = nil
-
-    i += 1 and next
-  end
-
-  if name.nil? && date.nil?
-    name = input[i]
-    date = input[i + 1]
-    i += 2 and next
-  end
-
-  next if exercise
-
-  exercise = input[i]
-  info = {
-    name: name,
-    date: date,
-    exercise: exercise,
-    loads: [],
-    reps: [],
-    rpes: []
-  }
-
-  i += 1
-  loop do
-    matches = input[i].match(SET_REGX)
-    if matches
-      info[:loads] << matches[:weight]
-      info[:reps]  << matches[:reps]
-      info[:rpes]  << matches[:rpe]
-      i += 1 and next
-    end
-
-    matches = input[i].match(SET_WITHOUT_RPE_REGX)
-    if matches
-      info[:loads] << matches[:weight]
-      info[:reps]  << matches[:reps]
-      i += 1 and next
-    end
-
-    matches = input[i].match(SET_ONLY_REPS_REGX)
-    if matches
-      info[:reps] << matches[:reps]
-      i += 1 and next
-    end
-
-    result << info
-    exercise = nil
-    break
+# select the rows that are after a given date
+relevant = []
+input = CSV.parse($stdin.read, headers: true)
+input.each do |row|
+  workout_date = Date.parse(row["Date"])
+  if workout_date >= date
+    relevant << row
   end
 end
 
-out = CSV.generate(force_quotes: true) do |csv|
-  result.each do |entry|
-    csv << [
-      entry.fetch(:name),
-      entry.fetch(:exercise),
-      entry.fetch(:reps).join(','),
-      entry.fetch(:loads).join(','),
-      entry.fetch(:rpes).map { |r| 10 - r.to_i }.join(',')
-    ]
+# group the rows by workout name and exercise name
+groups = relevant.group_by do |row|
+  [row["Workout Name"], row["Exercise Name"]]
+end
+
+def format_number(n)
+  i, f = n.to_i, n.to_f
+  i == f ? i : f
+end
+
+# generate a CSV to be imported outside of this script
+output = CSV.generate(headers: false, force_quotes: true) do |csv|
+  groups.each do |(workout_name, exercise_name), rows|
+    exercise = []
+    exercise << workout_name
+    exercise << exercise_name
+    exercise << rows.map { |r| r["Reps"] }.join(",")
+
+    exercise << rows.map do |r|
+      weight = r["Weight"].to_f
+      weight == 0 ? nil : format_number(weight)
+    end.compact.join(",")
+
+    exercise << rows.map do |r|
+      next unless r["RPE"]
+      10 - r["RPE"].to_i
+    end.compact.join(",")
+
+    csv << exercise
   end
 end
-puts out
+
+puts output

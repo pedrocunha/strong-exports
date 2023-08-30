@@ -19,7 +19,7 @@ end
 
 # group the rows by workout name and exercise name
 groups = relevant.group_by do |row|
-  [row["Workout Name"], row["Exercise Name"]]
+  [row["Date"], row["Workout Name"], row["Exercise Name"]]
 end
 
 def format_number(n)
@@ -29,8 +29,9 @@ end
 
 # generate a CSV to be imported outside of this script
 output = CSV.generate(headers: false, force_quotes: true) do |csv|
-  groups.each do |(workout_name, exercise_name), rows|
+  groups.each do |(workout_date, workout_name, exercise_name), rows|
     exercise = []
+    exercise << workout_date
     exercise << workout_name
     exercise << exercise_name
     exercise << rows.map { |r| r["Reps"] }.join(",")
